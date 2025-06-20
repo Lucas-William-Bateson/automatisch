@@ -27,7 +27,7 @@ jobs:
         working-directory: packages/backend
       - run: echo "🍏 This job's status is ${{ job.status }}."
   start-backend-server:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -49,7 +49,7 @@ jobs:
           WEBHOOK_SECRET_KEY: sample_webhook_secret_key
       - run: echo "🍏 This job's status is ${{ job.status }}."
   start-backend-worker:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -71,7 +71,7 @@ jobs:
           WEBHOOK_SECRET_KEY: sample_webhook_secret_key
       - run: echo "🍏 This job's status is ${{ job.status }}."
   build-web:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -91,3 +91,16 @@ jobs:
         env:
           CI: false
       - run: echo "🍏 This job's status is ${{ job.status }}."
+  deploy:
+    needs: [build-web]
+    runs-on: self-hosted
+    env:
+      ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+      WEBHOOK_SECRET_KEY: ${{ secrets.WEBHOOK_SECRET_KEY }}
+      APP_SECRET_KEY: ${{ secrets.APP_SECRET_KEY }}
+      IMAGE_TAG: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy with Docker Compose
+        run: |
+          docker compose -f docker-compose.yml up -d --build

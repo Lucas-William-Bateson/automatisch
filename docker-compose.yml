@@ -1,6 +1,7 @@
 version: '3.9'
 services:
   main:
+    image: localhost:5001/${NAME}:${IMAGE_TAG}
     build:
       context: ./docker
       dockerfile: Dockerfile.compose
@@ -28,6 +29,7 @@ services:
     volumes:
       - automatisch_storage:/automatisch/storage
   worker:
+    image: localhost:5001/${NAME}:${IMAGE_TAG}
     build:
       context: ./docker
       dockerfile: Dockerfile.compose
